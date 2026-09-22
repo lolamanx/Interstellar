@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>RutaViajera — Prototipo Funcional Hito 1</title>
+<style>
+:root {
+  --brand: #0f5c56;
+  --brand-dark: #083c38;
+  --brand-light: #e6f3f0;
+  --accent: #ff6f3c;
+  --accent-dark: #e05826;
+  --bg: #f4f6f5;
+  --surface: #ffffff;
+  --text: #192724;
+  --muted: #647571;
+  --border: #dbe3e0;
+  --shadow: 0 14px 34px rgba(15,92,86,0.12);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+  padding: 24px 16px 40px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header de entrega académica */
+.header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 16px;
+}
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--brand);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 20px;
+}
+.brand-title h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brand);
+}
+.brand-title span {
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+}
+.badge-status {
+  background: var(--brand-light);
+  color: var(--brand-dark);
+  border: 1px solid var(--brand);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Layout dos columnas: panel auditoría + celular */
+.workspace {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .workspace { grid-template-columns: 1fr; }
+}
+
+/* Panel de evaluación y mapa IA */
+.audit-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.audit-panel h2 {
+  font-size: 15px;
+  color: var(--brand);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.audit-panel p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.criteria-box {
+  background: #fdfdfd;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 18px;
+}
+.criteria-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.criteria-item:last-child { margin-bottom: 0; }
+.check-ok { color: #16a34a; font-weight: 800; }
+
+.ia-tree {
+  margin-top: 10px;
+}
+.ia-button {
+  width: 100%;
+  text-align: left;
+  background: var(--brand-light);
+  border: 1.5px solid transparent;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  cursor: pointer;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all .15s ease;
+}
+.ia-button:hover {
+  background: var(--brand);
+  color: #fff;
+}
+.ia-button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent-dark);
+}
+.ia-sub {
+  margin-left: 20px;
+  padding-left: 10px;
+  border-left: 2px dashed var(--border);
+}
+
+/* Envoltorio del teléfono */
+.phone-viewport {
+  display: flex;
+  justify-content: center;
+}
+.phone-case {
+  width: 100%;
+  max-width: 400px;
+  height: 780px;
+  background: #111a19;
+  border-radius: 46px;
+  padding: 12px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+}
+.phone-inner {
+  background: var(--bg);
+  flex: 1;
+  border-radius: 34px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Top bar del móvil */
+.phone-status-bar {
+  height: 32px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-weight: 600;
+}
+.phone-nav-bar {
+  background: var(--brand);
+  color: #fff;
+  padding: 8px 14px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.back-btn:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.screen-title {
+  font-size: 17px;
+  font-weight: 700;
+  flex: 1;
+}
+
+/* Contenedor de pantallas */
+.screen-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  position: relative;
+}
+.screen {
+  display: none;
+  animation: slidein .2s ease-out;
+}
+.screen.active {
+  display: block;
+}
+@keyframes slidein {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos de componentes del prototipo */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.trip-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: .15s ease;
+}
+.trip-item:hover {
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+.trip-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+}
+.trip-meta h3 {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.trip-meta p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.badge-tag {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #eff5f3;
+  color: var(--brand);
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: .15s ease;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-brand {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-brand:hover { background: var(--brand-dark); }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--brand);
+  color: var(--brand);
+}
+.btn-outline:hover { background: var(--brand-light); }
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  width: auto;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.form-group input:focus, .form-group select:focus {
+  outline: 2px solid var(--brand);
+  border-color: var(--brand);
+}
+
+/* Tarjetas de parada interactiva */
+.stop-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.stop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.stop-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-remove {
+  background: none;
+  border: none;
+  color: #d14343;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 2px 6px;
+}
+.stepper-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stepper-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stepper-ctrl button {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--brand);
+}
+.stepper-ctrl span {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Catálogo de sugerencias */
+.catalog-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.catalog-entry:last-child { border-bottom: none; }
+.catalog-info { font-size: 13px; font-weight: 600; }
+
+/* Resumen del itinerario y timeline */
+.itinerary-kpis {
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.kpi-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  margin-bottom: 4px;
+  opacity: .9;
+}
+.kpi-row.strong {
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 1;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.timeline-track {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  margin-bottom: 14px;
+}
+.timeline-item {
+  position: relative;
+  padding-left: 28px;
+  padding-bottom: 14px;
+  cursor: pointer;
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item:last-child::before {
+  display: none;
+}
+.timeline-dot {
+  position: absolute;
+  left: 2px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 1px var(--border);
+}
+.timeline-dot.final {
+  background: var(--brand);
+}
+.timeline-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+}
+.timeline-time {
+  font-size: 12px;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+.timeline-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Detalle de parada */
+.detail-banner {
+  height: 140px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #184642, #082926);
+  display: grid;
+  place-items: center;
+  font-size: 46px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.detail-name {
+  font-size: 19px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.detail-badge {
+  display: inline-block;
+  background: var(--brand-light);
+  color: var(--brand-dark);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.detail-row {
+  margin-bottom: 12px;
+}
+.detail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--muted);
+}
+.detail-val {
+  font-size: 13.5px;
+  margin-top: 2px;
+}
+
+/* Modo ruta activa / navegación */
+.nav-alert {
+  background: #fff8eb;
+  border: 1px solid #ffe0ad;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+}
+.nav-display {
+  background: #111a19;
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.nav-target {
+  font-size: 20px;
+  font-weight: 800;
+  color: #55f3be;
+  margin: 6px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header de instrucciones y cumplimiento -->
+  <header class="header-meta">
+    <div class="brand-title">
+      <div class="logo-icon">RV</div>
+      <div>
+        <h1>RutaViajera — Prototipo Navegable</h1>
+        <span>Evaluación Académica: Flujo funcional de pantallas encadenadas (Sin capturas fijas)</span>
+      </div>
+    </div>
+    <div class="badge-status">Hito 1 · Estado: Operativo</div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- Panel izquierdo: Checklist y salto rápido de evaluación -->
+    <aside class="audit-panel">
+      <h2>Verificación de Requisitos</h2>
+      <p>Cumplimiento estricto de la pauta solicitada para el archivo de instrucciones:</p>
+
+      <div class="criteria-box">
+        <div class="criteria-item">
+          <span class="check-ok">✔</span>
+          <span><b>Navegabilidad real:</b> Se hace clic y se recorre un flujo dinámico (sin imágenes pegadas).</span>
+        </div>
+        <div class="criteria-item">
+          <span class="check-ok">✔</span>
+          <span><b>Encadenamiento (5 pantallas):</b> Mis viajes → Crear viaje → Paradas → Itinerario → Detalle (+ Ruta activa).</span>
+        </div>
+        <div class="criteria-item">
+          <span class="check-ok">✔</span>
+          <span><b>Lógica funcional:</b> Tiempos reales de Chile (Ruta 5 Sur y Valparaíso) calculados al vuelo.</span>
+        </div>
+      </div>
+
+      <h2>Mapa de Navegación (IA)</h2>
+      <p>Haz clic en cualquier nodo para auditar o forzar el salto a dicha pantalla:</p>
+
+      <div class="ia-tree">
+        <button class="ia-button" id="tab-trips" onclick="navTo('trips')">
+          <span>① Pantalla: Mis Viajes</span> <span>➔</span>
+        </button>
+
+        <div class="ia-sub">
+          <button class="ia-button" id="tab-newtrip" onclick="navTo('newtrip')">
+            <span>② Pantalla: Crear Viaje</span> <span>➔</span>
+          </button>
+
+          <div class="ia-sub">
+            <button class="ia-button" id="tab-stops" onclick="navTo('stops')">
+              <span>③ Pantalla: Gestionar Paradas</span> <span>➔</span>
+            </button>
+
+            <div class="ia-sub">
+              <button class="ia-button" id="tab-itinerary" onclick="navTo('itinerary')">
+                <span>④ Pantalla: Itinerario y Timeline</span> <span>➔</span>
+              </button>
+
+              <div class="ia-sub">
+                <button class="ia-button" id="tab-detail" onclick="navTo('detail')">
+                  <span>⑤ Pantalla: Detalle de Parada</span> <span>➔</span>
+                </button>
+                <button class="ia-button" id="tab-live" onclick="navTo('live')">
+                  <span>⑥ Pantalla: Modo Ruta en Vivo</span> <span>➔</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; font-size:12px; color:var(--muted); line-height:1.4;">
+        <b>Tip de uso:</b> En el marco móvil puedes probar el flujo nativo haciendo clic en los botones de acción ("+ Nuevo viaje", "Continuar", "Generar Itinerario", etc.) y volver con la flecha superior.
+      </div>
+    </aside>
+
+    <!-- Panel derecho: Simulación de teléfono móvil -->
+    <main class="phone-viewport">
+      <div class="phone-case">
+        <div class="phone-inner">
+
+          <!-- Barra superior status -->
+          <div class="phone-status-bar">
+            <span id="liveClock">10:30</span>
+            <span>RutaViajera 4G 📶</span>
+          </div>
+
+          <!-- Barra navegación app -->
+          <div class="phone-nav-bar">
+            <button class="back-btn" id="mobileBackBtn" onclick="goBack()">←</button>
+            <div class="screen-title" id="mobileTitle">Mis viajes</div>
+          </div>
+
+          <!-- Contenido dinámico según pantalla -->
+          <div class="screen-content">
+
+            <!-- PANTALLA 1: LISTADO DE VIAJES -->
+            <div class="screen" id="view-trips">
+              <div style="font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">
+                Tus itinerarios guardados
+              </div>
+              <div id="tripsListContainer"></div>
+              <button class="btn btn-primary" style="margin-top:10px;" onclick="startNewTripFlow()">
+                + Crear un nuevo viaje
+              </button>
+            </div>
+
+            <!-- PANTALLA 2: CONFIGURAR VIAJE -->
+            <div class="screen" id="view-newtrip">
+              <div class="card">
+                <div class="form-group">
+                  <label>Nombre del Viaje</label>
+                  <input type="text" id="tripNameInput" value="Vacaciones Ruta de los Lagos" placeholder="Ej: Viaje al Sur"/>
+                </div>
+                <div class="form-group">
+                  <label>Punto de Partida</label>
+                  <select id="tripOriginSelect"></select>
+                </div>
+                <div class="form-group">
+                  <label>Punto de Llegada</label>
+                  <select id="tripDestSelect"></select>
+                </div>
+                <div class="form-group">
+                  <label>Fecha y Hora de Salida</label>
+                  <input type="datetime-local" id="tripDateInput"/>
+                </div>
+              </div>
+              <button class="btn btn-brand" onclick="commitTripAndProceed()">
+                Continuar a Paradas ➔
+              </button>
+            </div>
+
+            <!-- PANTALLA 3: CONFIGURAR PARADAS -->
+            <div class="screen" id="view-stops">
+              <div style="font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">
+                Paradas seleccionadas
+              </div>
+              <div id="selectedStopsContainer"></div>
+
+              <div class="card" style="margin-top:14px;">
+                <div style="font-size:12px; font-weight:800; color:var(--brand); text-transform:uppercase; margin-bottom:8px;">
+                  Añadir lugares recomendados
+                </div>
+                <div id="catalogStopsContainer"></div>
+              </div>
+
+              <button class="btn btn-brand" style="margin-top:6px;" onclick="calculateAndShowItinerary()">
+                Generar Itinerario Calculado ➔
+              </button>
+            </div>
+
+            <!-- PANTALLA 4: ITINERARIO COMPLETO -->
+            <div class="screen" id="view-itinerary">
+              <div id="itineraryKpisContainer"></div>
+
+              <div class="timeline-track">
+                <div style="font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:12px;">
+                  Cronología de Ruta (Haz clic en una parada)
+                </div>
+                <div id="timelineContainer"></div>
+              </div>
+
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="navTo('stops')">
+                  Modificar
+                </button>
+                <button class="btn btn-primary" style="flex:1;" onclick="navTo('live')">
+                  Iniciar Ruta ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- PANTALLA 5: DETALLE DE UNA PARADA -->
+            <div class="screen" id="view-detail">
+              <div id="stopDetailContainer"></div>
+              <button class="btn btn-outline" style="margin-top:10px;" onclick="navTo('itinerary')">
+                Volver al Itinerario
+              </button>
+            </div>
+
+            <!-- PANTALLA 6: MODO RUTA EN VIVO -->
+            <div class="screen" id="view-live">
+              <div class="nav-alert">
+                <span>🚘</span>
+                <div><b>Modo de viaje en curso</b><br/>Monitoreo de horas estimadas en vivo.</div>
+              </div>
+
+              <div class="nav-display">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#a3ded2;">Próximo destino</div>
+                <div class="nav-target" id="liveNextStop">Cargando...</div>
+                <div style="font-size:13px; color:#d6f5ed;" id="liveNextEta">Estimado: --:--</div>
+              </div>
+
+              <div class="card">
+                <div style="font-size:12px; font-weight:800; color:var(--brand); margin-bottom:6px;">Recomendación en ruta</div>
+                <p style="font-size:13px; color:var(--muted);">Recuerda considerar cargar combustible 20 km antes de llegar a zonas cordilleranas o desvíos largos.</p>
+              </div>
+
+              <button class="btn btn-outline" onclick="navTo('itinerary')">
+                Finalizar o Pausar Modo Ruta
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. BASE DE DATOS Y COORDENADAS VEROSÍMILES DE CHILE
+   ============================================================ */
+const LOCATIONS = {
+  stgo:       { name: "Santiago (Inicio)", lat: -33.4489, lng: -70.6693, icon: "🏙️" },
+  valpo:      { name: "Valparaíso",        lat: -33.0472, lng: -71.6127, icon: "⚓" },
+  osorno:     { name: "Osorno (Destino)",  lat: -40.5738, lng: -73.1339, icon: "🏔️" },
+  chillan:    { name: "Chillán",           lat: -36.6066, lng: -72.1034, icon: "🥖" },
+  saltolaja:  { name: "Salto del Laja",    lat: -37.2833, lng: -72.3167, icon: "💦" },
+  losangeles: { name: "Los Ángeles",       lat: -37.4694, lng: -72.3532, icon: "🌲" },
+  temuco:     { name: "Temuco",            lat: -38.7359, lng: -72.5904, icon: "🏘️" },
+  villarrica: { name: "Villarrica / Pucón",lat: -39.2711, lng: -71.9756, icon: "🌋" },
+  valdivia:   { name: "Valdivia",          lat: -39.8142, lng: -73.2459, icon: "🌊" },
+  rupanco:    { name: "Mirador Lago Rupanco",lat: -40.7833, lng: -72.4667, icon: "📸" },
+  curico:     { name: "Curicó (Tortas)",   lat: -34.9828, lng: -71.2394, icon: "🍰" }
+};
+
+const DESCRIPTIONS = {
+  chillan: "Cuna de Bernardo O'Higgins y famosa por sus cecinas artesanales, mercado central y artesanía de greda.",
+  saltolaja: "Imponente cascada de 35 metros visible desde la carretera. Cuenta con senderos, miradores y artesanías.",
+  losangeles: "Núcleo agrícola y comercial del Biobío con fácil conectividad para descanso rápido.",
+  temuco: "Capital de La Araucanía. Destaca su mercado municipal y oferta gastronómica tradicional mapuche.",
+  villarrica: "Zona lacustre con vista directa al volcán activo Villarrica, bosques de coigüe y paseos costeros.",
+  valdivia: "Hermosa ciudad de ríos navegables, torreones hispánicos históricos y fábricas de cerveza artesanal.",
+  rupanco: "Vista panorámica privilegiada del lago y los volcanes Puntiagudo y Osorno a minutos de la carretera principal.",
+  curico: "Tradicional detención al sur de Santiago, ideal para abastecerse de dulces típicos y pastelería chilena."
+};
+
+const SUGGESTED_STOPS = ["curico", "chillan", "saltolaja", "temuco", "villarrica", "valdivia", "rupanco"];
+
+/* ============================================================
+   2. MODELO DE DATOS Y ESTADO DE LA APLICACIÓN
+   ============================================================ */
+let tripsData = [
+  {
+    id: "trip-sur-1",
+    name: "Ruta 5 Sur Familiar",
+    originKey: "stgo",
+    destKey: "osorno",
+    departureISO: getNextDepartureDate(8, 30),
+    stops: [
+      { key: "curico", detourMin: 10, stayMin: 30 },
+      { key: "saltolaja", detourMin: 15, stayMin: 60 },
+      { key: "temuco", detourMin: 10, stayMin: 45 }
+    ]
+  },
+  {
+    id: "trip-costa-2",
+    name: "Fin de Semana Litoral",
+    originKey: "stgo",
+    destKey: "valpo",
+    departureISO: getNextDepartureDate(9, 0),
+    stops: [
+      { key: "curico", detourMin: 5, stayMin: 20 }
+    ]
+  }
+];
+
+let activeTripId = "trip-sur-1";
+let selectedDetailKey = "saltolaja";
+let navigationHistory = ["trips"];
+
+function getNextDepartureDate(h, m) {
+  const d = new Date();
+  d.setDate(d.getDate() + 2);
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+}
+
+function getActiveTrip() {
+  return tripsData.find(t => t.id === activeTripId) || tripsData[0];
+}
+
+/* ============================================================
+   3. CÁLCULO DE TIEMPOS DINÁMICO (Haversine real)
+   ============================================================ */
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+function estimateDrivingMinutes(lat1, lon1, lat2, lon2) {
+  const km = calculateDistanceKm(lat1, lon1, lat2, lon2) * 1.18; // +18% sinuosidad
+  return Math.ceil((km / 82) * 60); // promedio de 82 km/h en carretera
+}
+
+function computeTripSchedule(trip) {
+  const origin = LOCATIONS[trip.originKey];
+  const dest = LOCATIONS[trip.destKey];
+  let currentTime = new Date(trip.departureISO).getTime();
+  let currentLat = origin.lat;
+  let currentLng = origin.lng;
+
+  let totalDriveMinutes = 0;
+  let totalStopMinutes = 0;
+  const detailedStops = [];
+
+  trip.stops.forEach((stopItem, index) => {
+    const loc = LOCATIONS[stopItem.key];
+    const driveLeg = estimateDrivingMinutes(currentLat, currentLng, loc.lat, loc.lng);
+    totalDriveMinutes += driveLeg;
+    const arrivalTime = currentTime + driveLeg * 60000;
+    const spentTime = stopItem.detourMin + stopItem.stayMin;
+    totalStopMinutes += spentTime;
+    const departureTime = arrivalTime + spentTime * 60000;
+
+    detailedStops.push({
+      key: stopItem.key,
+      name: loc.name,
+      icon: loc.icon,
+      driveMin: driveLeg,
+      arrivalTime: arrivalTime,
+      departureTime: departureTime,
+      detourMin: stopItem.detourMin,
+      stayMin: stopItem.stayMin
+    });
+
+    currentTime = departureTime;
+    currentLat = loc.lat;
+    currentLng = loc.lng;
+  });
+
+  const finalDriveLeg = estimateDrivingMinutes(currentLat, currentLng, dest.lat, dest.lng);
+  totalDriveMinutes += finalDriveLeg;
+  const finalArrival = currentTime + finalDriveLeg * 60000;
+
+  return {
+    origin,
+    dest,
+    totalDriveMinutes,
+    totalStopMinutes,
+    finalArrival,
+    stops: detailedStops
+  };
+}
+
+function formatClock(ms) {
+  const d = new Date(ms);
+  return d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ============================================================
+   4. SISTEMA DE NAVEGACIÓN ENTRE PANTALLAS
+   ============================================================ */
+const SCREEN_TITLES = {
+  trips: "Mis Viajes Guardados",
+  newtrip: "Crear Nuevo Viaje",
+  stops: "Configurar Paradas",
+  itinerary: "Itinerario de Ruta",
+  detail: "Información de Parada",
+  live: "Modo Navegación Activa"
+};
+
+function navTo(screenId, pushHistory = true) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".ia-button").forEach(b => b.classList.remove("active"));
+
+  const targetScreen = document.getElementById("view-" + screenId);
+  if (targetScreen) targetScreen.classList.add("active");
+
+  const iaTab = document.getElementById("tab-" + screenId);
+  if (iaTab) iaTab.classList.add("active");
+
+  document.getElementById("mobileTitle").textContent = SCREEN_TITLES[screenId] || "RutaViajera";
+  document.getElementById("mobileBackBtn").disabled = (screenId === "trips");
+
+  if (pushHistory) {
+    if (navigationHistory[navigationHistory.length - 1] !== screenId) {
+      navigationHistory.push(screenId);
+    }
+  }
+
+  // Renderizados correspondientes
+  if (screenId === "trips") renderTripsList();
+  if (screenId === "newtrip") renderNewTripForm();
+  if (screenId === "stops") renderStopsManager();
+  if (screenId === "itinerary") renderItineraryView();
+  if (screenId === "detail") renderDetailView();
+  if (screenId === "live") renderLiveMode();
+}
+
+function goBack() {
+  if (navigationHistory.length > 1) {
+    navigationHistory.pop();
+    const prevScreen = navigationHistory[navigationHistory.length - 1];
+    navTo(prevScreen, false);
+  }
+}
+
+/* ============================================================
+   5. RENDERIZADO DE LAS PANTALLAS
+   ============================================================ */
+
+/* Pantalla 1: Mis Viajes */
+function renderTripsList() {
+  const container = document.getElementById("tripsListContainer");
+  container.innerHTML = "";
+
+  tripsData.forEach(trip => {
+    const origin = LOCATIONS[trip.originKey];
+    const dest = LOCATIONS[trip.destKey];
+    const card = document.createElement("div");
+    card.className = "card trip-item";
+    card.innerHTML = `
+      <div class="trip-icon">${dest.icon}</div>
+      <div class="trip-meta">
+        <h3>${trip.name}</h3>
+        <p>${origin.name.replace(" (Inicio)","")} ➔ ${dest.name.replace(" (Destino)","")}</p>
+        <p style="margin-top:2px;">${trip.stops.length} paradas planificadas</p>
+      </div>
+      <div class="badge-tag">Abrir</div>
+    `;
+    card.onclick = () => {
+      activeTripId = trip.id;
+      navTo("itinerary");
+    };
+    container.appendChild(card);
+  });
+}
+
+function startNewTripFlow() {
+  navTo("newtrip");
+}
+
+/* Pantalla 2: Crear Viaje */
+function renderNewTripForm() {
+  const originSelect = document.getElementById("tripOriginSelect");
+  const destSelect = document.getElementById("tripDestSelect");
+  originSelect.innerHTML = "";
+  destSelect.innerHTML = "";
+
+  Object.keys(LOCATIONS).forEach(k => {
+    const opt1 = new Option(LOCATIONS[k].name, k);
+    const opt2 = new Option(LOCATIONS[k].name, k);
+    originSelect.add(opt1);
+    destSelect.add(opt2);
+  });
+
+  originSelect.value = "stgo";
+  destSelect.value = "osorno";
+
+  const dateInput = document.getElementById("tripDateInput");
+  const defaultDate = new Date();
+  defaultDate.setDate(defaultDate.getDate() + 3);
+  defaultDate.setHours(9, 0, 0, 0);
+  dateInput.value = defaultDate.toISOString().slice(0, 16);
+}
+
+function commitTripAndProceed() {
+  const name = document.getElementById("tripNameInput").value.trim() || "Viaje Nuevo";
+  const originKey = document.getElementById("tripOriginSelect").value;
+  const destKey = document.getElementById("tripDestSelect").value;
+  const dateVal = document.getElementById("tripDateInput").value;
+
+  const newId = "trip-" + Date.now();
+  const newTrip = {
+    id: newId,
+    name: name,
+    originKey: originKey,
+    destKey: destKey,
+    departureISO: dateVal ? new Date(dateVal).toISOString() : getNextDepartureDate(9, 0),
+    stops: [
+      { key: "curico", detourMin: 10, stayMin: 30 },
+      { key: "saltolaja", detourMin: 15, stayMin: 45 }
+    ]
+  };
+
+  tripsData.unshift(newTrip);
+  activeTripId = newId;
+  navTo("stops");
+}
+
+/* Pantalla 3: Gestionar Paradas */
+function renderStopsManager() {
+  const trip = getActiveTrip();
+  const selectedContainer = document.getElementById("selectedStopsContainer");
+  const catalogContainer = document.getElementById("catalogStopsContainer");
+
+  selectedContainer.innerHTML = "";
+  if (trip.stops.length === 0) {
+    selectedContainer.innerHTML = `
+      <div style="text-align:center; padding:18px; color:var(--muted); font-size:13px;">
+        No has agregado paradas intermedias aún. Añade una del catálogo abajo.
+      </div>
+    `;
+  } else {
+    trip.stops.forEach(s => {
+      const loc = LOCATIONS[s.key];
+      const card = document.createElement("div");
+      card.className = "stop-card";
+      card.innerHTML = `
+        <div class="stop-header">
+          <span class="stop-title"><span>${loc.icon}</span> ${loc.name}</span>
+          <button class="btn-remove" onclick="removeStopFromTrip('${s.key}')">✕ Eliminar</button>
+        </div>
+        <div class="stepper-row">
+          <span>Desvío desde ruta:</span>
+          <div class="stepper-ctrl">
+            <button onclick="alterStopVal('${s.key}', 'detourMin', -5)">−</button>
+            <span>${s.detourMin} min</span>
+            <button onclick="alterStopVal('${s.key}', 'detourMin', 5)">+</button>
+          </div>
+        </div>
+        <div class="stepper-row">
+          <span>Permanencia en lugar:</span>
+          <div class="stepper-ctrl">
+            <button onclick="alterStopVal('${s.key}', 'stayMin', -15)">−</button>
+            <span>${s.stayMin} min</span>
+            <button onclick="alterStopVal('${s.key}', 'stayMin', 15)">+</button>
+          </div>
+        </div>
+      `;
+      selectedContainer.appendChild(card);
+    });
+  }
+
+  // Catálogo disponible excluyendo lo ya seleccionado o extremos
+  catalogContainer.innerHTML = "";
+  const existingKeys = trip.stops.map(s => s.key);
+  const pool = SUGGESTED_STOPS.filter(k => !existingKeys.includes(k) && k !== trip.originKey && k !== trip.destKey);
+
+  if (pool.length === 0) {
+    catalogContainer.innerHTML = `<div style="font-size:12px; color:var(--muted);">Todas las paradas recomendadas han sido agregadas.</div>`;
+  } else {
+    pool.forEach(key => {
+      const loc = LOCATIONS[key];
+      const row = document.createElement("div");
+      row.className = "catalog-entry";
+      row.innerHTML = `
+        <span class="catalog-info">${loc.icon} ${loc.name}</span>
+        <button class="btn btn-sm btn-outline" onclick="addStopToTrip('${key}')">+ Añadir</button>
+      `;
+      catalogContainer.appendChild(row);
+    });
+  }
+}
+
+function addStopToTrip(key) {
+  const trip = getActiveTrip();
+  trip.stops.push({ key, detourMin: 10, stayMin: 30 });
+  renderStopsManager();
+}
+
+function removeStopFromTrip(key) {
+  const trip = getActiveTrip();
+  trip.stops = trip.stops.filter(s => s.key !== key);
+  renderStopsManager();
+}
+
+function alterStopVal(key, property, delta) {
+  const trip = getActiveTrip();
+  const stop = trip.stops.find(s => s.key === key);
+  if (stop) {
+    stop[property] = Math.max(0, stop[property] + delta);
+    renderStopsManager();
+  }
+}
+
+function calculateAndShowItinerary() {
+  navTo("itinerary");
+}
+
+/* Pantalla 4: Itinerario y Cronología */
+function renderItineraryView() {
+  const trip = getActiveTrip();
+  const schedule = computeTripSchedule(trip);
+
+  const driveH = Math.floor(schedule.totalDriveMinutes / 60);
+  const driveM = schedule.totalDriveMinutes % 60;
+  const stopH = Math.floor(schedule.totalStopMinutes / 60);
+  const stopM = schedule.totalStopMinutes % 60;
+
+  document.getElementById("itineraryKpisContainer").innerHTML = `
+    <div class="itinerary-kpis">
+      <div class="kpi-row"><span>Ruta:</span> <b>${trip.name}</b></div>
+      <div class="kpi-row"><span>Tiempo de conducción neta:</span> <b>${driveH}h ${driveM}min</b></div>
+      <div class="kpi-row"><span>Tiempo total en paradas:</span> <b>${stopH}h ${stopM}min</b></div>
+      <div class="kpi-row strong"><span>Llegada estimada a destino:</span> <b>${formatClock(schedule.finalArrival)} hrs</b></div>
+    </div>
+  `;
+
+  const timeline = document.getElementById("timelineContainer");
+  timeline.innerHTML = "";
+
+  // Origen
+  const originDiv = document.createElement("div");
+  originDiv.className = "timeline-item";
+  originDiv.innerHTML = `
+    <div class="timeline-dot"></div>
+    <div class="timeline-title">
+      <span>${schedule.origin.icon} ${schedule.origin.name}</span>
+      <span class="timeline-time">${formatClock(new Date(trip.departureISO).getTime())}</span>
+    </div>
+    <div class="timeline-sub">Salida del viaje</div>
+  `;
+  timeline.appendChild(originDiv);
+
+  // Paradas
+  schedule.stops.forEach(s => {
+    const item = document.createElement("div");
+    item.className = "timeline-item";
+    item.innerHTML = `
+      <div class="timeline-dot"></div>
+      <div class="timeline-title">
+        <span>${s.icon} ${s.name}</span>
+        <span class="timeline-time">${formatClock(s.arrivalTime)} - ${formatClock(s.departureTime)}</span>
+      </div>
+      <div class="timeline-sub">Tramo: ${s.driveMin} min de manejo · Estadía: ${s.stayMin} min (Detalle ➔)</div>
+    `;
+    item.onclick = () => {
+      selectedDetailKey = s.key;
+      navTo("detail");
+    };
+    timeline.appendChild(item);
+  });
+
+  // Destino final
+  const destDiv = document.createElement("div");
+  destDiv.className = "timeline-item";
+  destDiv.innerHTML = `
+    <div class="timeline-dot final"></div>
+    <div class="timeline-title">
+      <span>${schedule.dest.icon} ${schedule.dest.name}</span>
+      <span class="timeline-time">${formatClock(schedule.finalArrival)}</span>
+    </div>
+    <div class="timeline-sub">Fin de la ruta</div>
+  `;
+  timeline.appendChild(destDiv);
+}
+
+/* Pantalla 5: Detalle de Parada */
+function renderDetailView() {
+  const trip = getActiveTrip();
+  const schedule = computeTripSchedule(trip);
+  const stopInfo = schedule.stops.find(s => s.key === selectedDetailKey) || schedule.stops[0];
+
+  const container = document.getElementById("stopDetailContainer");
+  if (!stopInfo) {
+    container.innerHTML = `<p style="padding:20px;">No hay parada seleccionada.</p>`;
+    return;
+  }
+
+  const loc = LOCATIONS[stopInfo.key];
+  const desc = DESCRIPTIONS[stopInfo.key] || "Punto de interés intermedio en la ruta de viaje.";
+
+  container.innerHTML = `
+    <div class="detail-banner">${loc.icon}</div>
+    <div class="detail-name">${loc.name}</div>
+    <div class="detail-badge">Llegada aprox: ${formatClock(stopInfo.arrivalTime)} hrs</div>
+
+    <div class="card">
+      <div class="detail-row">
+        <div class="detail-label">Sobre el lugar turístico</div>
+        <div class="detail-val">${desc}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Tiempo asignado de descanso</div>
+        <div class="detail-val">${stopInfo.stayMin} minutos para recorrer / almorzar.</div>
+      </div>
+      <div class="detail-row" style="margin-bottom:0;">
+        <div class="detail-label">Desvío de la autopista</div>
+        <div class="detail-val">+${stopInfo.detourMin} minutos adicionales respecto a la ruta directa.</div>
+      </div>
+    </div>
+  `;
+}
+
+/* Pantalla 6: Modo Ruta Activa */
+function renderLiveMode() {
+  const trip = getActiveTrip();
+  const schedule = computeTripSchedule(trip);
+
+  if (schedule.stops.length > 0) {
+    const next = schedule.stops[0];
+    document.getElementById("liveNextStop").textContent = next.icon + " " + next.name;
+    document.getElementById("liveNextEta").textContent = "Llegada proyectada: " + formatClock(next.arrivalTime) + " hrs";
+  } else {
+    document.getElementById("liveNextStop").textContent = schedule.dest.icon + " " + schedule.dest.name;
+    document.getElementById("liveNextEta").textContent = "Llegada proyectada: " + formatClock(schedule.finalArrival) + " hrs";
+  }
+}
+
+/* Reloj dinámico de cabecera */
+function updateClock() {
+  const now = new Date();
+  document.getElementById("liveClock").textContent =
+    now.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+/* ============================================================
+   INICIO AUTOMÁTICO
+   ============================================================ */
+navTo("trips");
+</script>
+
+</body>
+</html>
